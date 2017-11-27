@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from time import sleep
-from multiprocessing import Pool, Process
 from random import random
-from math import floor
 
 class Engine():
 
@@ -15,10 +13,11 @@ class Engine():
         self.rsleep()
         return str(a+b)
 
-    def test(self):
-        self.rsleep()
+    def test(self, time):
+        time = time[0]
+        self.rsleep(time)
         return "awake"
 
-    def rsleep(self):
-        time = random() * 3
-        sleep(time)
+    def rsleep(self, *time):
+        sleepTime = int(time[0]) if time else random() * 3
+        sleep(sleepTime)

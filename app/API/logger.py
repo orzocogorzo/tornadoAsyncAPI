@@ -67,9 +67,9 @@ class Logger():
     def track(self, func):
         this = self
         @wraps(func)
-        def func_wrapper(handler):
+        def func_wrapper(handler, *args):
             start = this.log_start()
-            result = func(handler)
+            result = func(handler, args)
             this.log_end(start)
             return result
 

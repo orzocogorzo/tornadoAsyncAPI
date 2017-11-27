@@ -34,13 +34,13 @@ class MainHandler(RequestHandler):
 class SumHandler(RequestHandler):
     @gen.coroutine
     @lg.track
-    def get(self):
+    def get(self, args):
         data = ut.serializeData(self, {'a': int, 'b': int})
-        response = self.engineRequest(**data)
+        response = self.engineRequest(data)
         self.write(response)
         self.finish()
 
-    def engineRequest(self, **data):
+    def engineRequest(self, data):
         result = spawn(engine.sum, data['a'], data['b'])
         result.run()
         response = result.get()
@@ -49,28 +49,28 @@ class SumHandler(RequestHandler):
 class RestHandler(RequestHandler):
     @gen.coroutine
     @lg.track
-    def get(self):
+    def get(self, args):
         data = ut.serializeData(self, {'a': int, 'b': int})
-        result = self.engineRequest(**data)
+        result = self.engineRequest(data)
         self.write(result.result())
         self.finish()
 
-    @asynchronous
-    def engineRequest(self, **data):
+    @gen.coroutine
+    def engineRequest(self, data):
         result = engine.rest(a=data['a'], b=data['b'])
         raise gen.Return(result)
 
 class TestHandler(RequestHandler):
     @gen.coroutine
     @lg.track
-    def get(self):
-        result = yield self.engineRequest()
+    def get(self, args):
+        result = yield self.engineRequest(args)
         self.write(result)
         self.finish()
 
     @gen.coroutine
-    def engineRequest(self, **data):
-        result = engine.test()
+    def engineRequest(self, args):
+        result = engine.test(args)
         raise gen.Return(result)
 
 # APP ROUTES
@@ -78,7 +78,7 @@ routes = [
     (r"/", MainHandler),
     (r"/sum", SumHandler),
     (r"/rest", RestHandler),
-    (r"/test", TestHandler),
+    (r"/test/([0-9]+)", TestHandler),
 ]
 
 
